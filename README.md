@@ -3,10 +3,8 @@ _Fight social distancing with a cool DIY electronics project!_
 
 <a href="rfl_in_action.jpg"><img alt="Remote Friednship Lamp in Action" align="right" width="240" src="rfl_in_action.jpg"></a>I've built a long-distance friendship lamp. I got the basic idea [from here](https://lastingthedistance.com/long-distance-friendship-lamps/) – but built and programmed it from ground up myself. It was a super easy DIY electronics project for beginners that you can easily copy, adapt or extend. Besides a bit of soldering and hardware tinkering, I used C++ in the Arduino IDE to program the microcontroller along with a bit of PHP for the webservice.
 
-Spark joy by making your "I think of someone special" thoughts visible! Or:
+Spark a bit of joy by making your thoughts visible in a fun and colorful way. Or, as Hobbes puts it:
 > I think our actions show what's in our hearts!
-(Hobbes to Calvin)
-
 <div style="clear:both;"></div>
 
 ## The basic idea
