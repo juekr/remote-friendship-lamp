@@ -484,3 +484,6 @@ Have fun rebuilding or improving this – and don't forget to [let me know about
 ## Licensing info
 
 This project with all its contents is under CC BY NC 4.0 license. Learn more about what you may and what you may not do here: https://creativecommons.org/licenses/by-nc/4.0/deed.de (German) or here: https://creativecommons.org/licenses/by-nc/4.0/deed.en (English)
+
+## PS
+After writing this, I found another remote friendship lamp project that even has a access-point mechanic for entering wifi credentials. Sweet! I might implement that in a future version (if I'll ever built another one): https://www.instructables.com/Filia-the-Homemade-Friendship-Lamp/
