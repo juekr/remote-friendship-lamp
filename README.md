@@ -65,6 +65,8 @@ What I've used to build this:
 
 The hardware part is extremely easy (otherwise I probably would have failed): You just need to connect the touch button to GND and VU (= 5 Volt) as well as Pin D1. The pixel ring also connects to GND and VU as well as Pin D2. That's it. For power supply you can simply feed 5 Volt via USB or the VIN and GND pins.
 
+![Wiring](RemoteFriendShipLamp_Wiring.jpg)
+
 ### Lampshade
 
 My wife build that. I only know the base is made of some kind of concrete clay and diffusor lamp shade material that she glued thin fabrics on. The top is a Pringles lid which by chance happened to have exactly the right size. She build it so that a) we can hide most of the electronics in the lamp foot and b) that the capacitive touch button works through the lamp shade (oder the lid), more or less hiding the button and its wiring. 
