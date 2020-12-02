@@ -3,13 +3,15 @@ _Fight social distancing with a cool DIY electronics project!_
 
 I've built a long-distance friendship lamp. I got the basic idea [from here](https://lastingthedistance.com/long-distance-friendship-lamps/) – but built and programmed it from ground up myself. It was a super easy DIY electronics project for beginners that you can easily copy, adapt or extend. Besides a bit of soldering and hardware tinkering, I used C++ in the Arduino IDE to program the microcontroller along with a bit of PHP for the webservice.
 
-
+![Remote Friendship Lamps in Action](rfl_in_action.jpg)
 
 ## The basic idea
 
 I wanted to have a pair of connected lamps – one for me to keep and one to send out to distant family members. Whenever one party presses a button on the lamp, it lights up in COLOR A, while the remote lamp lights up in COLOR B. After 15 minutes, both lamps automatically turn off again. If during that 15-minute period the other party also presses the button, both lamps will light up in COLOR C for 15 minutes.
 
 **I guess, you could call it a sophisticated electronic "I think of you" mechanism with "I think of you as well" response functionality.**
+
+![Remote Friendship Lamp Demo](remote_lamp_demo.gif)
 
 ## The Logic
 
