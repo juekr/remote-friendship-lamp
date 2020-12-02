@@ -5,6 +5,9 @@ _Fight social distancing with a cool DIY electronics project!_
 
 Spark a bit of joy by making your thoughts visible in a fun and colorful way. Or, as Hobbes puts it:
 > I think our actions show what's in our hearts!
+
+[Hobbes, Tiger, 1980](https://external-preview.redd.it/XGgIQUHgdbvrMPL4EI7pZfU4FAOrZ7vDmg1FeSHJIg4.jpg?auto=webp&s=f7aeaf9eec62aafb4f04f245f938edc0b449c20c)
+
 <div style="clear:both;"></div>
 
 ## The basic idea
@@ -68,6 +71,8 @@ What I've used to build this:
 - a NeoPixel multicolor led ring with 24 leds (affiliate Link to Amazon Germany: https://amzn.to/3mhcDFY | non-affiliate link: https://www.amazon.de/gp/product/B07L81WMC9/ref=ppx_yo_dt_b_asin_title_o02_s02?ie=UTF8&psc=1)
 - a capacitive touch button (affiliate Link to Amazon Germany: https://amzn.to/33nu28t | non-affiliate link: https://www.amazon.de/gp/product/B0769DKZN5/ref=ppx_yo_dt_b_asin_title_o02_s01?ie=UTF8&psc=1)
 - (USB) cables and soldering equipment (I had that already laying around)
+
+<a href="rfl_ring.jpg"><img src="rfl_ring.jpg" witdh="240"></a> <a href="rfl_shade.jpg"><img src="rfl_shade.jpg" witdh="240"></a> <a href="rfl_base.jpg"><img src="rfl_base.jpg" witdh="240"></a>
 
 The hardware part is extremely easy (otherwise I probably would have failed): You just need to connect the touch button to GND and VU (= 5 Volt) as well as Pin D1. The pixel ring also connects to GND and VU as well as Pin D2. That's it. For power supply you can simply feed 5 Volt via USB or the VIN and GND pins.
 
