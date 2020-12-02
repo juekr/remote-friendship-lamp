@@ -25,6 +25,8 @@ Okay, so each lamp has 3*ish* states:
 
 Once a minute, each lamp asks a webservice if it is supposed to turn on – and if so, which color it should display. At each call, the webservice checks in the background whether there have been any changes within the last 15 minutes: if yes, the current state is still valid and it returns the color that should be displayed. If not, it resets the statuses and tells both lamps to turn off.
 
+![Lamp states](lamp_states.jpg)
+
 ### Webservice
 
 From a lamp's perspective, all the webservice does, is returning a RGB code. Therefore I wrote a little PHP script that reads and writes a text file for each lamp. I tuses the file's "last modified" meta information to determine whether there have been changes in the last 15 minutes. If "last modifided" is > 15 minutes, that means there have not been any recent changes, it resets the files by writing "0,0,0" into them.
