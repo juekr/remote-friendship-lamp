@@ -56,7 +56,7 @@ The logic behind that in detail:
 
 #### A few thoughts that led me to exactly this solution (but I am very open to suggestions!):
 
-- I already had this webspace laying around and felt comfortable solving the project in PHP – but basiucally any technique that opens up a listening connection via the internet should work. You could maybe even use a VPN and let the lamps directly talk to each other!
+- I already had webspace that I could use for this project and felt comfortable solving everything in PHP – but basiucally any technique that opens up a listening connection via the internet should work. You could maybe even use a VPN and let the lamps directly talk to each other!
 - I wanted to be able to change colors, even after shipping the lamp – in my setup I just have to change the color variables in the PHP code. But, of course, you also could "hard wire" the colors right into the lamps if you prefer.
 - Using the text files to save the status(es) enables me to use the files meta information to decide if time's up  – that proved to work quite reliably. 
 - Yes, there is a little delay of < 60 seconds in which the colors could be not in sync (see video). But I guess that's okay. You can lower the `interval` in the C++ code to reduce this delay resulting in more calls to the webservice.
@@ -80,19 +80,17 @@ The hardware part is extremely easy (otherwise I probably would have failed): Yo
 
 ### Lampshade
 
-My wife build that. I only know the base is made of some kind of concrete clay and diffusor lamp shade material that she glued thin fabrics on. The top is a Pringles lid which by chance happened to have exactly the right size. She build it so that a) we can hide most of the electronics in the lamp foot and b) that the capacitive touch button works through the lamp shade (oder the lid), more or less hiding the button and its wiring. 
+My wife has built that. I only know that the base is made of some kind of concrete clay – and the lamp shade is built out of diffusing lamp shade material that she glued thin fabrics on. The top is a Pringles lid which by chance happened to have exactly the right diameter. We hid most of the electronics in the lamp foot and hot glued the capacitive touch button to the inside of the lid – it is sensible enough to work through the plastic and that way we could effectively hide the button and its wiring. 
 
 ## Software
 
-The software part is quite easy as well. My initial impulse was to not show you my _spaghetti-ish_ code – but, what the heck, by showing my inability to write clean code, I open myself up to feedback which hopefully will improve my coding skills in the long run. So here we go! 
+The software part is quite easy as well. My initial impulse was to not publicly show my spaghetti*ish* code – but, then I thougt "What the heck ...?!". By showing my inability to write clean code, I open myself up to criticism and feedback which hopefully will improve my coding skills in the long run. So here we go! 
 
-**As I said earlier, it consists of two parts:**
-
-### C++ (Arduino) code on NodeMCU
+### Part 1 of the software: C++ (Arduino) code on NodeMCU
 
 ```c++
-/**
-   Remote Friendship Lamp
+/*
+   Remote Friendship Lamp // Client Code
    23.11.2020
    Jürgen Krauß
    @MirUnauffaellig
@@ -372,10 +370,17 @@ void myHttpRequest(String statusMode) {
 
 **Important note:** You need to get the NodeMCU into your Arduino IDE via the board manager. Also, you'll need the Neopixel libary for using the led ring. (In case you decide to use the same materials as me.)
 
-### PHP code on webserver
+### Part 1 of the software: PHP code on webserver
 
 ```php
 <?php 
+/*
+   Remote Friendship Lamp // Server Code
+   23.11.2020
+   Jürgen Krauß
+   @MirUnauffaellig
+*/
+
 /* Possible GET parameters and values (that's maybe an unnecessary layer of security but gives you a good feeling for which values to expect in your script) */
 $valid = array(
 	"mode" => array(true, array("get-status", "set-status", "admin")),
@@ -384,8 +389,8 @@ $valid = array(
 	"status" => array(false)
 );
 $colors = array("i_think" => "9,33,211", 
-				"you_think" => "229,11,11", 
-				"we_think" => "0,204,0");
+		"you_think" => "229,11,11", 
+		"we_think" => "0,204,0");
 
 /* Check existence and plausibility of GET parameters AND copy them into local variables for easier referencing */
 foreach ($valid as $key => $v):
@@ -498,5 +503,5 @@ Have fun rebuilding or improving this – and don't forget to [let me know about
 
 This project with all its contents is under CC BY NC 4.0 license. Learn more about what you may and what you may not do here: https://creativecommons.org/licenses/by-nc/4.0/deed.de (German) or here: https://creativecommons.org/licenses/by-nc/4.0/deed.en (English)
 
-## PS
-After writing this, I found another remote friendship lamp project that even has a access-point mechanic for entering wifi credentials. Sweet! I might implement that in a future version (if I'll ever built another one): https://www.instructables.com/Filia-the-Homemade-Friendship-Lamp/
+## Post Scriptum
+After writing this, I found another remote friendship lamp project that even has an access-point mechanic for entering wifi credentials. Sweet! I might implement that in a future version (if I'll ever built another one): https://www.instructables.com/Filia-the-Homemade-Friendship-Lamp/
