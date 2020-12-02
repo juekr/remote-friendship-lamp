@@ -45,7 +45,7 @@ The logic behind that in detail:
 
   3. mode => can have one of two values:
 
-  - `get-status`=> the corresponding status text file is read and its contents are send back to the lamp as a comma-separated RGB value (i. e. `133,7,0`)
+  - `get-status`=> the corresponding status text file is read and its contents are send back to the lamp as a comma-separated RGB value (i. e. `133,7,0`); also: with each status check, the status text files' `last_modified` date is read – after 15 minutes in which no `set-status` request was registered, all status files will be reset to `0,0,0`
   - `set-status` => we need to consider two cases:
     - lamp was off => then we set it to "I think of you" by writing COLOR A to the file for _this_ lamp and COLOR B ("You think of me") to the file for the _other_ lamp; also, the color code gets returned
     - lamp was already on and showed COLOR B => both lamps are being set to COLOR C ("We think of each other") by writing the corresponding color code to _both_ files (and returning als output)
