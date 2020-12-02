@@ -23,7 +23,7 @@ Okay, so each lamp has 3*ish* states:
 4. (also there kinda is a fourth "setup" state, in which the lamp boots and waits for the WiFi connection to get established – it pulses in COLOR D while doing that)
 5. (and, of course, there is a fifth "off, but waiting for instructions" state)
 
-This is how I solved that: Once a minute, each lamp asks a webservice if it is supposed to turn on – and if so, which color it should display. At each call, the webservice checks whether there have been any changes within the last 15 minutes: if yes, it returns the color that should be displayed. If not, it resets the statuses and tells both lamps to turn off.
+Once a minute, each lamp asks a webservice if it is supposed to turn on – and if so, which color it should display. At each call, the webservice checks in the background whether there have been any changes within the last 15 minutes: if yes, the current state is still valid and it returns the color that should be displayed. If not, it resets the statuses and tells both lamps to turn off.
 
 ### Webservice
 
