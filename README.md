@@ -77,7 +77,7 @@ The software part is quite easy as well. My initial impulse was to not show you 
 
 ### C++ (Arduino) code on NodeMCU
 
-```
+```c++
 /**
    Remote Friendship Lamp
    23.11.2020
@@ -361,7 +361,7 @@ void myHttpRequest(String statusMode) {
 
 ### PHP code on webserver
 
-```
+```php
 <?php 
 /* Possible GET parameters and values (that's maybe an unnecessary layer of security but gives you a good feeling for which values to expect in your script) */
 $valid = array(
