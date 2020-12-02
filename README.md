@@ -1,7 +1,7 @@
 # DIY Remote Friendship Lamp
 _Fight social distancing with a cool DIY electronics project!_ 
 
-<img align="right" width="100" src="rfl_in_action.jpg">I've built a long-distance friendship lamp. I got the basic idea [from here](https://lastingthedistance.com/long-distance-friendship-lamps/) – but built and programmed it from ground up myself. It was a super easy DIY electronics project for beginners that you can easily copy, adapt or extend. Besides a bit of soldering and hardware tinkering, I used C++ in the Arduino IDE to program the microcontroller along with a bit of PHP for the webservice.
+<a href="rfl_in_action.jpg"><img alt="Remote Friednship Lamp in Action" align="right" width="240" src="rfl_in_action.jpg"></a>I've built a long-distance friendship lamp. I got the basic idea [from here](https://lastingthedistance.com/long-distance-friendship-lamps/) – but built and programmed it from ground up myself. It was a super easy DIY electronics project for beginners that you can easily copy, adapt or extend. Besides a bit of soldering and hardware tinkering, I used C++ in the Arduino IDE to program the microcontroller along with a bit of PHP for the webservice.
 <div style="clear:both;"></div>
 
 ## The basic idea
