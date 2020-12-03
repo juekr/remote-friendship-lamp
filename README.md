@@ -64,9 +64,9 @@ The logic behind that in detail:
 
 What I've used to build this:
 
-- a NodeMCU V3 (basically a ESP8266 with WiFi) (affiliate Link to Amazon Germany: https://amzn.to/2JmrAIg | non-affiliate link: https://www.amazon.de/gp/product/B06Y1ZPNMS/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
-- a NeoPixel multicolor led ring with 24 leds (affiliate Link to Amazon Germany: https://amzn.to/3mhcDFY | non-affiliate link: https://www.amazon.de/gp/product/B07L81WMC9/ref=ppx_yo_dt_b_asin_title_o02_s02?ie=UTF8&psc=1)
-- a capacitive touch button (affiliate Link to Amazon Germany: https://amzn.to/33nu28t | non-affiliate link: https://www.amazon.de/gp/product/B0769DKZN5/ref=ppx_yo_dt_b_asin_title_o02_s01?ie=UTF8&psc=1)
+- a NodeMCU V3 (basically a ESP8266 with WiFi): [affiliate Link to Amazon Germany](https://amzn.to/2JmrAIg) | [non-affiliate link](https://www.amazon.de/gp/product/B06Y1ZPNMS/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
+- a NeoPixel multicolor led ring with 24 leds: [affiliate Link to Amazon Germany[(https://amzn.to/3mhcDFY) | [non-affiliate link](https://www.amazon.de/gp/product/B07L81WMC9/ref=ppx_yo_dt_b_asin_title_o02_s02?ie=UTF8&psc=1)
+- a capacitive touch button: [affiliate Link to Amazon Germany](https://amzn.to/33nu28t) | [non-affiliate link](https://www.amazon.de/gp/product/B0769DKZN5/ref=ppx_yo_dt_b_asin_title_o02_s01?ie=UTF8&psc=1)
 - (USB) cables and soldering equipment (I had that already laying around)
 
 <a href="rfl_ring.jpg"><img src="rfl_ring.jpg" width="240" style="display: inline-block;"></a> <a href="rfl_shade.jpg"><img src="rfl_shade.jpg" width="240" style="display: inline-block;"></a> <a href="rfl_base.jpg"><img src="rfl_base.jpg" width="240" style="display: inline-block;"></a>
@@ -498,7 +498,7 @@ Have fun rebuilding or improving this – and don't forget to [let me know about
 
 ## Licensing info
 
-This project with all its contents is under CC BY NC 4.0 license. Learn more about what you may and what you may not do here: https://creativecommons.org/licenses/by-nc/4.0/deed.de (German) or here: https://creativecommons.org/licenses/by-nc/4.0/deed.en (English)
+This project with all its contents is under CC BY NC 4.0 license. Learn more about what you may and what you may not do here: ([German](https://creativecommons.org/licenses/by-nc/4.0/deed.de) | [English](https://creativecommons.org/licenses/by-nc/4.0/deed.en))
 
 ## Post Scriptum
-After writing this, I found another remote friendship lamp project that even has an access-point mechanic for entering wifi credentials. Sweet! I might implement that in a future version (if I'll ever built another one): https://www.instructables.com/Filia-the-Homemade-Friendship-Lamp/
+After writing this, I found [another remote friendship lamp project](https://www.instructables.com/Filia-the-Homemade-Friendship-Lamp/) that even has an access-point mechanic for entering wifi credentials. Sweet! I might implement that in a future version (if I'll ever built another one).
