@@ -1,7 +1,7 @@
 # DIY Remote Friendship Lamp
 _Fight social distancing with a cool DIY electronics project!_ 
 
-<a href="rfl_in_action.jpg"><img alt="Remote Friednship Lamp in Action" align="right" width="240" src="rfl_in_action.jpg"></a>I've built a long-distance friendship lamp. I got the basic idea [from here](https://lastingthedistance.com/long-distance-friendship-lamps/) – but built and programmed it from ground up myself. It was a super easy DIY electronics project for beginners that you can easily copy, adapt or extend. Besides a bit of soldering and hardware tinkering, I used C++ in the Arduino IDE to program the microcontroller along with a bit of PHP for the webservice.
+<a href="rfl_in_action.jpg"><img alt="Remote Friednship Lamp in Action" align="right" width="240" src="rfl_in_action.jpg" style="margin: 0.5em;"></a>I've built a long-distance friendship lamp. I got the basic idea [from here](https://lastingthedistance.com/long-distance-friendship-lamps/) – but built and programmed it from ground up myself. It was a super easy DIY electronics project for beginners that you can easily copy, adapt or extend. Besides a bit of soldering and hardware tinkering, I used C++ in the Arduino IDE to program the microcontroller along with a bit of PHP for the webservice.
 
 Spark joy by making your thoughts visible to a special someone in an interesting and colorful way ... or just have fun playing around with coding and electronics!  
 
@@ -65,7 +65,7 @@ The logic behind that in detail:
 What I've used to build this:
 
 - a NodeMCU V3 (basically a ESP8266 with WiFi): [affiliate Link to Amazon Germany](https://amzn.to/2JmrAIg) | [non-affiliate link](https://www.amazon.de/gp/product/B06Y1ZPNMS/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
-- a NeoPixel multicolor led ring with 24 leds: [affiliate Link to Amazon Germany[(https://amzn.to/3mhcDFY) | [non-affiliate link](https://www.amazon.de/gp/product/B07L81WMC9/ref=ppx_yo_dt_b_asin_title_o02_s02?ie=UTF8&psc=1)
+- a NeoPixel multicolor led ring with 24 leds: [affiliate Link to Amazon Germany](https://amzn.to/3mhcDFY) | [non-affiliate link](https://www.amazon.de/gp/product/B07L81WMC9/ref=ppx_yo_dt_b_asin_title_o02_s02?ie=UTF8&psc=1)
 - a capacitive touch button: [affiliate Link to Amazon Germany](https://amzn.to/33nu28t) | [non-affiliate link](https://www.amazon.de/gp/product/B0769DKZN5/ref=ppx_yo_dt_b_asin_title_o02_s01?ie=UTF8&psc=1)
 - (USB) cables and soldering equipment (I had that already laying around)
 
