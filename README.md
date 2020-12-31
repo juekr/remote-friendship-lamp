@@ -7,6 +7,8 @@ Spark joy by making your thoughts visible to a special someone in an interesting
 
 <div style="clear:both;"></div>
 
+**Version 2 update:** Now each lamp can run with the exact same code (because it uses the board ID as identifier instead of hard coded lamp names. Also it includes the WifiManager library which lets you easily manage wifi credentials without having to hard code them into the board's code.
+
 ## The basic idea
 
 I wanted to have a pair of connected lamps – one for me to keep and one to send out to distant family members. Whenever one party presses a button on the lamp, it lights up in COLOR A, while the remote lamp lights up in COLOR B. After 15 minutes, both lamps automatically turn off again. If during that 15-minute period the other party also presses the button, both lamps will light up in COLOR C for 15 minutes.
@@ -56,6 +58,7 @@ The logic behind that in detail:
 - I already had webspace that I could use for this project and felt comfortable solving everything in PHP – but basiucally any technique that opens up a listening connection via the internet should work. You could maybe even use a VPN and let the lamps directly talk to each other!
 - I wanted to be able to change colors, even after shipping the lamp – in my setup I just have to change the color variables in the PHP code. But, of course, you also could "hard wire" the colors right into the lamps if you prefer.
 - Using the text files to save the status(es) enables me to use the files meta information to decide if time's up  – that proved to work quite reliably. 
+– I also use a text file to determine which lamp is in a pair with which other lamp. 
 - Yes, there is a little delay of < 60 seconds in which the colors could be not in sync (see video). But I guess that's okay. You can lower the `interval` in the C++ code to reduce this delay resulting in more calls to the webservice.
 
 ## Hardware
@@ -86,9 +89,13 @@ The software part is quite easy as well. My initial impulse was to not publicly 
 ### Part 1 of the software: C++ (Arduino) code on NodeMCU
 
 ```c++
-/*
-   Remote Friendship Lamp // Client Code
-   23.11.2020
+/**
+   Remote Friendship Lamp
+   23.11.2020 
+   Last update: 
+      - 31.12.2020
+      - using board id as identifier (so each lamp can run with the exact same code)
+      - using WiFiManager library for accessing unknown wifis (so each lamp can run w... you get it)
    Jürgen Krauß
    @MirUnauffaellig
 */
@@ -98,25 +105,18 @@ The software part is quite easy as well. My initial impulse was to not publicly 
   #include <avr/power.h>
 #endif
 #include <ESP8266WiFi.h>
-#include <ESP8266WiFiMulti.h>
-#include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
+#include <ESP8266HTTPClient.h>
 #include <math.h>
+#include <DNSServer.h>            
+#include <ESP8266WebServer.h>     
+#include <WiFiManager.h>
 
-// Depending on the Board ID, the code decides which WiFi credentials to use
-#define STASSID_dth "wifi_ssid_1"
-#define STAPSK_dth  "wifi-psk-1"
-#define STASSID_ka "wifi_ssid_2"
-#define STAPSK_ka "wifi-psk-2"
-
-#define LAMP_PIN   4
-#define BUTTON_PIN 5
+#define LAMP_PIN   5
+#define BUTTON_PIN 4
 #define NUMPIXELS 24 // Number of leds on the Neopixel ring
-
-#define K_ID   16047792 // These are my ESP board ids to distinct between the two lamps. 
-#define S_ID   6553442
   
-String target_url = "https://WEBSERVICE_URL/lamp/api.php?key=AUTH_KEY&identifier=";
+String target_url = "https://WEBSERVICE_URL/lamp/api_v2.php?key=AUTH_KEY&identifier=";
 String lamp_id ="";
 
 int interval = 60000; // This is the 1-minute interval in which the lamps connect to the webservice
@@ -127,16 +127,19 @@ int LEDg = 0;
 int LEDb = 0;
 
 Adafruit_NeoPixel pixels(NUMPIXELS, LAMP_PIN, NEO_GRB + NEO_KHZ800);
-ESP8266WiFiMulti WiFiMulti;
+WiFiManager wifiManager;
 
 void setup() {
-  Serial.begin(115200); 
+  Serial.begin(9600); 
   Serial.print("\n");
   Serial.print("\n");
-  Serial.print(" ESP8266 Chip id = ");
+  Serial.print(" ESP8266 Chip id = lamp-id = ");
   Serial.print(String(ESP.getChipId()));
-  Serial.print("\n");
-
+  lamp_id = String(ESP.getChipId());
+  target_url = target_url + lamp_id;
+  Serial.print("\nUsing: ");
+  Serial.print(target_url + "\n");
+  
   #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)  // Not really sure if this is needed ...
     clock_prescale_set(clock_div_1);
   #endif
@@ -145,65 +148,21 @@ void setup() {
   pixels.clear();
   pinMode(BUTTON_PIN, INPUT);
   
-  Serial.println();
-  WiFi.disconnect(); // Otherwise it caches and remembers old login data
+  //WiFi.disconnect();   //Uncomment to delete old/saved WiFi credentials 
+  
+  doAnimation("setup");
   delay(500);
-  
-  WiFi.mode(WIFI_STA);
-  
-  Serial.println("Using: ");
-  Serial.print("  - ");
-   
-  if (ESP.getChipId() == K_ID) {  // By using the ESP.getId() function, we get an unique identifier for each lamp – 
-                              // so the same code can be used on both lamps and let the software decide which WiFi credentials to use.
-    WiFiMulti.addAP(STASSID_dth, STAPSK_dth);
-    lamp_id = "lamp-1";
-    Serial.print(STASSID_dth);
-    Serial.print(" | ");
-    Serial.print(STAPSK_dth);
-  }
-  if (ESP.getChipId() == S_ID) { 
-    WiFiMulti.addAP(STASSID_ka, STAPSK_ka);
-    lamp_id = "lamp-2";
-    Serial.print(STASSID_ka);
-    Serial.print(" | ");
-    Serial.print(STAPSK_ka);
-  }
-  
-   Serial.print("\n");
-   Serial.print("  - Lamp ID: ");
-   Serial.print(lamp_id);
-   Serial.print("\n  - ");
-   target_url = target_url + lamp_id;
-   Serial.print(target_url + "\n");
-   delay(500);
-   
-   while (WiFiMulti.run() != WL_CONNECTED) {  // Waiting for the WiFi to connect
-    doAnimation("setup");
-    Serial.println("Waiting for WiFi to connect");
-    if (millis() > 60000 * 5) { // After 5 minutes, try the other WiFi credentials ... because probably it wasn't shipped yet
-      Serial.println("Could not connect to WiFi for 5 minutes, trying the other WiFi network");
-      if (ESP.getChipId() == S_ID) { 
-        WiFiMulti.addAP(STASSID_dth, STAPSK_dth);
-        Serial.print(STASSID_dth);
-        Serial.print(" | ");
-        Serial.print(STAPSK_dth);
-      }
-      if (ESP.getChipId() == K_ID) { 
-        WiFiMulti.addAP(STASSID_ka, STAPSK_ka);
-        Serial.print(STASSID_ka);
-        Serial.print(" | ");
-        Serial.print(STAPSK_ka);
-      }
-      Serial.print("\n");
-    }
-   }
-   doAnimation("ack");
-   delay(500);
+  wifiManager.autoConnect(("setup-lamp-" + lamp_id).c_str()); // Tries to connect to a known wifi – 
+                                                               // if this failed, it opens up an access 
+                                                               // point with a captive portal asking for 
+                                                               // wifi credentials
+  doAnimation("ack");
+  doAnimation("off");
 }
 
 void loop() {
-   if (digitalRead(BUTTON_PIN) == 1) { // If the button is pressed, user feedback is given and a change of the lamps' states are requested via the webservice
+   if (digitalRead(BUTTON_PIN) == 1) { // If the button is pressed, user feedback is given and a  
+                                        // change of the lamps' state is requested via the webservice
     Serial.println("Button pressed!");
     doAnimation("ack");
     myHttpRequest("&mode=set-status");
@@ -219,16 +178,16 @@ void loop() {
     since_start = millis();
     current_loop_time = 0;
 
-    myHttpRequest("&mode=get-status"); // This is the once-every-60-seconds status check
+    /* Getting the status of THIS lamp */
+    /* ------------------------------------------------------ */
+    myHttpRequest("&mode=get-status");
+    /* ------------------------------------------------------ */ 
   }
   
   current_loop_time = millis() - since_start;
-  delay(10); // I guess this is not really needed but it doesn't make much sense to continously loop through everything millisecond after millisecond
+  delay(10); // I guess this is not really needed but it doesn't make much sense to 
+             // continously loop through everything millisecond after millisecond
 }
-
-/* ---- ---- ---- ---- ---- ---- ---- ---- 
- FUNCTIONS
----- ---- ---- ---- ---- ---- ---- ---- ---- */
 
 // Function for a smooth color change (led after led)
 void changeColor(uint32_t targetColor, int animationSpeed) {
@@ -306,10 +265,10 @@ void doAnimation(String which) {
   }
 }
 
-// This gets called to connect to the webservice, either for getting or for setting the lamp color
-// Here a simple HTTPS web request is being use – but this could be easily changed to support i. e. web sockets or something completely different 
+// Function to connect to the webservice, either for getting or for setting the lamp color
+// using a simple HTTPS web request – but this could be easily changed to support i. e. web 
+// sockets or something completely different 
 void myHttpRequest(String statusMode) {
-   if ((WiFiMulti.run() == WL_CONNECTED)) {
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setInsecure();
       HTTPClient https;
@@ -346,10 +305,13 @@ void myHttpRequest(String statusMode) {
               } else {
                 doAnimation("off");
               }
+            } else {
+              Serial.printf("[GET] Request... failed, error: %s\n", https.errorToString(httpCode).c_str());
+              doAnimation("error");
             }
           
         } else {
-          Serial.printf("[GET] Request... failed, error: %s\n", https.errorToString(httpCode).c_str());
+          Serial.println("[GET] Request... failed, HTTP returned zero");
           doAnimation("error");
         }
     
@@ -358,36 +320,37 @@ void myHttpRequest(String statusMode) {
         Serial.printf("[HTTPS.begin] Unable to connect\n");
         doAnimation("error");
       }  
-   } else {
-    Serial.printf("[WiFiMulti.run] failed to connect\n");
-    doAnimation("error");
-  }  
 }
 ```
 
-**Important note:** You need to get the NodeMCU into your Arduino IDE via the board manager. Also, you'll need the Neopixel libary for using the led ring. (In case you decide to use the same materials as me.)
+**Important note:** You need to get the NodeMCU into your Arduino IDE via the board manager. Also, you'll need the Neopixel libary for using the led ring (in case you decide to use the same materials as me) and the [WifiManager library](https://github.com/tzapu/WiFiManager) for managing wifi credentials and connections. 
 
 ### Part 1 of the software: PHP code on webserver
 
 ```php
 <?php 
-/*
-   Remote Friendship Lamp // Server Code
-   23.11.2020
+/**
+   Remote Friendship Lamp
+   23.11.2020 
+   Last update: 
+      - 31.12.2020
+      - using board id as identifier (so each lamp can run with the exact same code)
+      - using WiFiManager library for accessing unknown wifis (so each lamp can run w... you get it)
+      - reading pairs from a text file
    Jürgen Krauß
    @MirUnauffaellig
-*/
+**/
 
 /* Possible GET parameters and values (that's maybe an unnecessary layer of security but gives you a good feeling for which values to expect in your script) */
 $valid = array(
 	"mode" => array(true, array("get-status", "set-status", "admin")),
-	"identifier" => array(true, array("lamp-1", "lamp-2")),
+	"identifier" => array(false),
 	"key" => array(true, array("AUTH_KEY")),
 	"status" => array(false)
 );
 $colors = array("i_think" => "9,33,211", 
-		"you_think" => "229,11,11", 
-		"we_think" => "0,204,0");
+				"you_think" => "255,102,204", 
+				"we_think" => "102,255,51");
 
 /* Check existence and plausibility of GET parameters AND copy them into local variables for easier referencing */
 foreach ($valid as $key => $v):
@@ -401,12 +364,31 @@ foreach ($valid as $key => $v):
 	endif; 
 endforeach;
 
+/* Check for pairs in a textfile – pretty sure, this could be improved. */
+$error = "";
+$otherfile = "";
+$pairs = file("pairs.txt");
+if (count($pairs) == 0 || trim($pairs[0]) == ""):
+	$error = '<p><strong>Error:</strong> No pairs specified.</p>';
+else:
+	foreach ($pairs as $pair):
+		$pair = explode(" ", $pair);
+		if (count($pair) != 2) continue;
+		if ($identifier != $pair[0] && $identifier != $pair[1]): 
+			continue; 
+		else:
+			$otherfile = ($identifier == $pair[0] ? $pair[1] : $pair[0]).".txt";
+		endif;
+	endforeach;
+	if ($otherfile == "") $error = '<p><strong>Error:</strong> No pair found for ID '.$identifier.".</p>";
+endif;
+
 /* Read status file(s) (or create it) */
 $statusfile = $identifier.".txt";
-if ($identifier == $valid['identifier'][1][0]) $otherfile = $valid['identifier'][1][1].".txt"; else $otherfile = $valid['identifier'][1][0].".txt"; 
+//if ($identifier == $valid['identifier'][1][0]) $otherfile = $valid['identifier'][1][1].".txt"; else $otherfile = $valid['identifier'][1][0].".txt"; 
 
-if (!file_exists($statusfile)) file_put_contents($statusfile, "");
-if (!file_exists($otherfile)) file_put_contents($otherfile, "");
+if (!file_exists($statusfile)) file_put_contents($statusfile, "0,0,0");
+if (!file_exists($otherfile)) file_put_contents($otherfile, "0,0,0");
 
 $last_modified = date ("d.m.Y H:i:s", filemtime($statusfile));
 
@@ -414,6 +396,7 @@ $last_modified = date ("d.m.Y H:i:s", filemtime($statusfile));
 switch($mode) { 
 	/* getting the status */
 	case "get-status":
+		if ($error != "") die($error);
 		$diff = round((time()-filemtime($statusfile))/60);
 		$diff_other = round((time()-filemtime($otherfile))/60);
 
@@ -446,6 +429,7 @@ switch($mode) {
 
 	/* setting the status */
  	case "set-status":
+ 		if ($error != "") die($error);
 		if (file_get_contents($statusfile) == "0,0,0" || file_get_contents($statusfile) == $colors['i_think']) { 
  			file_put_contents($statusfile, $colors['i_think']);
  			echo $colors['i_think'];
@@ -460,7 +444,7 @@ switch($mode) {
 	/* debugging info */
 	case "admin": 
 		echo "<pre style=\"font-size: 1.5em;\">";
-		
+		echo $error;
 		$txtfiles = (listfiles("./", "txt"));
 		if (count($txtfiles) > 0) {
 			foreach ($txtfiles as $t) {
@@ -501,4 +485,4 @@ Have fun rebuilding or improving this – and don't forget to [let me know about
 This project with all its contents is under CC BY NC 4.0 license. Learn more about what you may and what you may not do here: ([German](https://creativecommons.org/licenses/by-nc/4.0/deed.de) | [English](https://creativecommons.org/licenses/by-nc/4.0/deed.en))
 
 ## Post Scriptum
-After writing this, I found [another remote friendship lamp project](https://www.instructables.com/Filia-the-Homemade-Friendship-Lamp/) that even has an access-point mechanic for entering wifi credentials. Sweet! I might implement that in a future version (if I'll ever built another one).
+After writing this, I found [another remote friendship lamp project](https://www.instructables.com/Filia-the-Homemade-Friendship-Lamp/) that gave me the idea for implementing the WifiManager which nicely handels all the access-point shenanegans. Sweet! ~~I might implement that in a future version (if I'll ever built another one).
