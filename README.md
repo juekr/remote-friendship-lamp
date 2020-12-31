@@ -74,7 +74,7 @@ What I've used to build this:
 
 <a href="rfl_ring.jpg"><img src="rfl_ring.jpg" width="240" style="display: inline-block;"></a> <a href="rfl_shade.jpg"><img src="rfl_shade.jpg" width="240" style="display: inline-block;"></a> <a href="rfl_base.jpg"><img src="rfl_base.jpg" width="240" style="display: inline-block;"></a>
 
-The hardware part is extremely easy (otherwise I probably would have failed): You just need to connect the touch button to GND and VU (= 5 Volt) as well as Pin D1. The pixel ring also connects to GND and VU as well as Pin D2. That's it. For power supply you can simply feed 5 Volt via USB or the VIN and GND pins.
+The hardware part is extremely easy (otherwise I probably would have failed): You just need to connect the touch button to GND and VU (= 5 Volt) as well as Pin D1. The pixel ring also connects to GND and VU as well as Pin D2. That's it. For power supply you can simply feed 5 Volt via USB or the VIN and GND pins. Note: on some versions of the NodeMCU board, there is no VU/VV pin – in that case you should be able to get 5V from the VIN pin.
 
 ![Wiring](RemoteFriendShipLamp_Wiring.jpg)
 
