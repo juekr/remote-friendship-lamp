@@ -35,7 +35,7 @@ Once a minute, each lamp asks a webservice if it is supposed to turn on – and 
 
 ### Webservice
 
-From a lamp's perspective, all the webservice does, is returning a RGB code. Therefore I wrote a little PHP script that reads and writes a text file for each lamp. I tuses the file's "last modified" meta information to determine whether there have been changes in the last 15 minutes. If "last modifided" is > 15 minutes, that means there have not been any recent changes, it resets the files by writing "0,0,0" into them.
+From a lamp's perspective, all the webservice does, is returning a RGB code. Therefore I wrote a little PHP script that reads and writes a text file for each lamp. I tuses the file's "last modified" meta information to determine whether there have been changes in the last 15 minutes. If "last modifided" is > 15 minutes, that means there have not been any recent changes, it resets the files by writing "0,0,0" into them. Another simple text file is being used to decide which lamps are paired (using their board ids).
 
 The logic behind that in detail:
 
