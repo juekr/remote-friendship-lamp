@@ -364,7 +364,7 @@ foreach ($valid as $key => $v):
 	endif; 
 endforeach;
 
-/* Check for pairs in a textfile – pretty sure, this could be improved. */
+/* Check for pairs */
 $error = "";
 $otherfile = "";
 $pairs = file("pairs.txt");
@@ -372,7 +372,8 @@ if (count($pairs) == 0 || trim($pairs[0]) == ""):
 	$error = '<p><strong>Error:</strong> No pairs specified.</p>';
 else:
 	foreach ($pairs as $pair):
-		$pair = explode(" ", $pair);
+		if (trim($pair) == "") continue;
+		$pair = explode(" ", trim($pair));
 		if (count($pair) != 2) continue;
 		if ($identifier != $pair[0] && $identifier != $pair[1]): 
 			continue; 
@@ -448,9 +449,12 @@ switch($mode) {
 		$txtfiles = (listfiles("./", "txt"));
 		if (count($txtfiles) > 0) {
 			foreach ($txtfiles as $t) {
+				if (substr_count($t, "pairs.txt") > 0) continue;
 				echo "<p>";
 				$diff = round((time()-filemtime($t))/60). " minutes";
-				echo "<strong>".$t."</strong> | file age: ".date ("d.m.Y H:i:s", filemtime($t))." | ".$diff."\n";
+				$geturl = $_SERVER['PHP_SELF']."?key=".$valid['key'][1][0]."&mode=get-status&identifier=".str_replace(".txt", "", $t);
+				$seturl = str_replace("get-status", "set-status", $geturl);
+				echo "<strong>".$t."</strong> | <a href=\"$geturl\">get-status</a>, <a href=\"$seturl\">set-status</a> | file age: ".date ("d.m.Y H:i:s", filemtime($t))." | ".$diff."\n";
 				echo file_get_contents("./".$t)."";
 				echo "</p>";
 			}
