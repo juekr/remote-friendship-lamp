@@ -117,8 +117,8 @@ switch($mode) {
 		echo "<pre style=\"font-size: 1.5em;\">";
 		echo $error;
 		$txtfiles = (listfiles("./", "txt"));
-		if (count($txtfiles) > 0) {
-			foreach ($txtfiles as $t) {
+		if (count($txtfiles) > 0):
+			foreach ($txtfiles as $t):
 				if (substr_count($t, "pairs.txt") > 0) continue;
 				echo "<p>";
 				$diff = round((time()-filemtime($t))/60). " minutes";
@@ -127,8 +127,14 @@ switch($mode) {
 				echo "<strong>".$t."</strong> | <a href=\"$geturl\">get-status</a>, <a href=\"$seturl\">set-status</a> | file age: ".date ("d.m.Y H:i:s", filemtime($t))." | ".$diff."\n";
 				echo file_get_contents("./".$t)."";
 				echo "</p>";
-			}
-		}
+			endforeach;
+		endif;
+		echo "<br />";
+		echo "<p>";
+		foreach ($colors as $key => $color):
+			echo "$key \t=> ".$color." \t=> <span style=\"color:rgb(".$color.");\">#####</span>\n";
+		endforeach;
+		echo "</p>";
 		echo "<br />";
 		echo "<p>";
 		var_dump($valid);
