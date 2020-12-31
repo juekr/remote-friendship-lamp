@@ -21,8 +21,8 @@
 #include <ESP8266WebServer.h>     
 #include <WiFiManager.h>
 
-#define LAMP_PIN   5
-#define BUTTON_PIN 4
+#define LAMP_PIN   4
+#define BUTTON_PIN 5
 #define NUMPIXELS 24 // Number of leds on the Neopixel ring
   
 String target_url = "https://WEBSERVICE_URL/lamp/api_v2.php?key=AUTH_KEY&identifier=";
