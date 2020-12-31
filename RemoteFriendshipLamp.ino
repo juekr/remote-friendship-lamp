@@ -1,6 +1,10 @@
-/*
-   Remote Friendship Lamp // Client Code
-   23.11.2020
+/**
+   Remote Friendship Lamp
+   23.11.2020 
+   Last update: 
+      - 31.12.2020
+      - using board id as identifier (so each lamp can run with the exact same code)
+      - using WiFiManager library for accessing unknown wifis (so each lamp can run w... you get it)
    Jürgen Krauß
    @MirUnauffaellig
 */
@@ -10,25 +14,18 @@
   #include <avr/power.h>
 #endif
 #include <ESP8266WiFi.h>
-#include <ESP8266WiFiMulti.h>
-#include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
+#include <ESP8266HTTPClient.h>
 #include <math.h>
+#include <DNSServer.h>            
+#include <ESP8266WebServer.h>     
+#include <WiFiManager.h>
 
-// Depending on the Board ID, the code decides which WiFi credentials to use
-#define STASSID_dth "wifi_ssid_1"
-#define STAPSK_dth  "wifi-psk-1"
-#define STASSID_ka "wifi_ssid_2"
-#define STAPSK_ka "wifi-psk-2"
-
-#define LAMP_PIN   4
-#define BUTTON_PIN 5
+#define LAMP_PIN   5
+#define BUTTON_PIN 4
 #define NUMPIXELS 24 // Number of leds on the Neopixel ring
-
-#define K_ID   16047792 // These are my ESP board ids to distinct between the two lamps. 
-#define S_ID   6553442
   
-String target_url = "https://WEBSERVICE_URL/lamp/api.php?key=AUTH_KEY&identifier=";
+String target_url = "https://WEBSERVICE_URL/lamp/api_v2.php?key=AUTH_KEY&identifier=";
 String lamp_id ="";
 
 int interval = 60000; // This is the 1-minute interval in which the lamps connect to the webservice
@@ -39,16 +36,19 @@ int LEDg = 0;
 int LEDb = 0;
 
 Adafruit_NeoPixel pixels(NUMPIXELS, LAMP_PIN, NEO_GRB + NEO_KHZ800);
-ESP8266WiFiMulti WiFiMulti;
+WiFiManager wifiManager;
 
 void setup() {
-  Serial.begin(115200); 
+  Serial.begin(9600); 
   Serial.print("\n");
   Serial.print("\n");
-  Serial.print(" ESP8266 Chip id = ");
+  Serial.print(" ESP8266 Chip id = lamp-id = ");
   Serial.print(String(ESP.getChipId()));
-  Serial.print("\n");
-
+  lamp_id = String(ESP.getChipId());
+  target_url = target_url + lamp_id;
+  Serial.print("\nUsing: ");
+  Serial.print(target_url + "\n");
+  
   #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)  // Not really sure if this is needed ...
     clock_prescale_set(clock_div_1);
   #endif
@@ -57,65 +57,21 @@ void setup() {
   pixels.clear();
   pinMode(BUTTON_PIN, INPUT);
   
-  Serial.println();
-  WiFi.disconnect(); // Otherwise it caches and remembers old login data
+  //WiFi.disconnect();   //Uncomment to delete old/saved WiFi credentials 
+  
+  doAnimation("setup");
   delay(500);
-  
-  WiFi.mode(WIFI_STA);
-  
-  Serial.println("Using: ");
-  Serial.print("  - ");
-   
-  if (ESP.getChipId() == K_ID) {  // By using the ESP.getId() function, we get an unique identifier for each lamp – 
-                              // so the same code can be used on both lamps and let the software decide which WiFi credentials to use.
-    WiFiMulti.addAP(STASSID_dth, STAPSK_dth);
-    lamp_id = "lamp-1";
-    Serial.print(STASSID_dth);
-    Serial.print(" | ");
-    Serial.print(STAPSK_dth);
-  }
-  if (ESP.getChipId() == S_ID) { 
-    WiFiMulti.addAP(STASSID_ka, STAPSK_ka);
-    lamp_id = "lamp-2";
-    Serial.print(STASSID_ka);
-    Serial.print(" | ");
-    Serial.print(STAPSK_ka);
-  }
-  
-   Serial.print("\n");
-   Serial.print("  - Lamp ID: ");
-   Serial.print(lamp_id);
-   Serial.print("\n  - ");
-   target_url = target_url + lamp_id;
-   Serial.print(target_url + "\n");
-   delay(500);
-   
-   while (WiFiMulti.run() != WL_CONNECTED) {  // Waiting for the WiFi to connect
-    doAnimation("setup");
-    Serial.println("Waiting for WiFi to connect");
-    if (millis() > 60000 * 5) { // After 5 minutes, try the other WiFi credentials ... because probably it wasn't shipped yet
-      Serial.println("Could not connect to WiFi for 5 minutes, trying the other WiFi network");
-      if (ESP.getChipId() == S_ID) { 
-        WiFiMulti.addAP(STASSID_dth, STAPSK_dth);
-        Serial.print(STASSID_dth);
-        Serial.print(" | ");
-        Serial.print(STAPSK_dth);
-      }
-      if (ESP.getChipId() == K_ID) { 
-        WiFiMulti.addAP(STASSID_ka, STAPSK_ka);
-        Serial.print(STASSID_ka);
-        Serial.print(" | ");
-        Serial.print(STAPSK_ka);
-      }
-      Serial.print("\n");
-    }
-   }
-   doAnimation("ack");
-   delay(500);
+  wifiManager.autoConnect(("setup-lamp-" + lamp_id).c_str()); // Tries to connect to a known wifi – 
+                                                               // if this failed, it opens up an access 
+                                                               // point with a captive portal asking for 
+                                                               // wifi credentials
+  doAnimation("ack");
+  doAnimation("off");
 }
 
 void loop() {
-   if (digitalRead(BUTTON_PIN) == 1) { // If the button is pressed, user feedback is given and a change of the lamps' states are requested via the webservice
+   if (digitalRead(BUTTON_PIN) == 1) { // If the button is pressed, user feedback is given and a  
+                                        // change of the lamps' state is requested via the webservice
     Serial.println("Button pressed!");
     doAnimation("ack");
     myHttpRequest("&mode=set-status");
@@ -131,16 +87,16 @@ void loop() {
     since_start = millis();
     current_loop_time = 0;
 
-    myHttpRequest("&mode=get-status"); // This is the once-every-60-seconds status check
+    /* Getting the status of THIS lamp */
+    /* ------------------------------------------------------ */
+    myHttpRequest("&mode=get-status");
+    /* ------------------------------------------------------ */ 
   }
   
   current_loop_time = millis() - since_start;
-  delay(10); // I guess this is not really needed but it doesn't make much sense to continously loop through everything millisecond after millisecond
+  delay(10); // I guess this is not really needed but it doesn't make much sense to 
+             // continously loop through everything millisecond after millisecond
 }
-
-/* ---- ---- ---- ---- ---- ---- ---- ---- 
- FUNCTIONS
----- ---- ---- ---- ---- ---- ---- ---- ---- */
 
 // Function for a smooth color change (led after led)
 void changeColor(uint32_t targetColor, int animationSpeed) {
@@ -218,10 +174,10 @@ void doAnimation(String which) {
   }
 }
 
-// This gets called to connect to the webservice, either for getting or for setting the lamp color
-// Here a simple HTTPS web request is being use – but this could be easily changed to support i. e. web sockets or something completely different 
+// Function to connect to the webservice, either for getting or for setting the lamp color
+// using a simple HTTPS web request – but this could be easily changed to support i. e. web 
+// sockets or something completely different 
 void myHttpRequest(String statusMode) {
-   if ((WiFiMulti.run() == WL_CONNECTED)) {
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setInsecure();
       HTTPClient https;
@@ -258,10 +214,13 @@ void myHttpRequest(String statusMode) {
               } else {
                 doAnimation("off");
               }
+            } else {
+              Serial.printf("[GET] Request... failed, error: %s\n", https.errorToString(httpCode).c_str());
+              doAnimation("error");
             }
           
         } else {
-          Serial.printf("[GET] Request... failed, error: %s\n", https.errorToString(httpCode).c_str());
+          Serial.println("[GET] Request... failed, HTTP returned zero");
           doAnimation("error");
         }
     
@@ -270,8 +229,4 @@ void myHttpRequest(String statusMode) {
         Serial.printf("[HTTPS.begin] Unable to connect\n");
         doAnimation("error");
       }  
-   } else {
-    Serial.printf("[WiFiMulti.run] failed to connect\n");
-    doAnimation("error");
-  }  
 }
