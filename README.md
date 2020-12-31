@@ -7,7 +7,7 @@ Spark joy by making your thoughts visible to a special someone in an interesting
 
 <div style="clear:both;"></div>
 
-**Version 2 update:** Now each lamp can run with the exact same code (because it uses the board ID as identifier instead of hard coded lamp names. Also it includes the WifiManager library which lets you easily manage wifi credentials without having to hard code them into the board's code.
+**Version 2 update:** Now each lamp can run with the exact same code (because it uses the board ID as identifier instead of hard coded lamp names. Also it includes the WifiManager library which lets you easily manage wifi credentials without having to hard code them into the lamps.
 
 ## The basic idea
 
