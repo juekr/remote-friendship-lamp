@@ -1,4 +1,16 @@
 <?php 
+/**
+   Remote Friendship Lamp
+   23.11.2020 
+   Last update: 
+      - 31.12.2020
+      - using board id as identifier (so each lamp can run with the exact same code)
+      - using WiFiManager library for accessing unknown wifis (so each lamp can run w... you get it)
+      - reading pairs from a text file
+   Jürgen Krauß
+   @MirUnauffaellig
+**/
+
 /* Possible GET parameters and values (that's maybe an unnecessary layer of security but gives you a good feeling for which values to expect in your script) */
 $valid = array(
 	"mode" => array(true, array("get-status", "set-status", "admin")),
